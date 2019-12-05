@@ -19,13 +19,26 @@ class SquareMap:
             'gray': (120, 120, 120),
         }
 
+    def display_map(self):
+        for i in range(self.board_width):
+            for j in range(self.board_height):
+                if (i + j) % 2 == 0:
+                    background_color = self.game_color['gray']
+                else:
+                    background_color = self.game_color['white']
+                pygame.draw.rect(self.game_display, background_color,
+                                 [i * self.cellsize, j * self.cellsize,
+                                  self.cellsize, self.cellsize])
+
     def loop(self):
         crashed = False
         while not crashed:
             for event in pygame.event.get():
+                print(event)
                 if event.type == pygame.QUIT:
                     crashed = True
             self.game_display.fill(self.game_color['white'])
+            self.display_map()
             pygame.display.update()
             self.clock.tick(60)
 
