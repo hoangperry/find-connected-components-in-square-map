@@ -1,9 +1,12 @@
 import pygame
+from algorithm import Graph
 
 
 class SquareMap:
     def __init__(self, board_width: int, board_height: int, cellsize: int = 40):
         pygame.init()
+        pygame.font.init()
+        self.myfont = pygame.font.SysFont('Comic Sans MS', cellsize)
         self.board_width = board_width
         self.board_height = board_height
         self.board = [[0 for i in range(board_width)] for i in range(board_height)]
@@ -11,6 +14,7 @@ class SquareMap:
         self.windows_width = cellsize * board_width
         self.windows_height = cellsize * board_height
         self.game_display = pygame.display.set_mode((self.windows_width, self.windows_height))
+        self.graph = Graph()
         self.clock = pygame.time.Clock()
         self.game_color = {
             'black': (0, 0, 0),
@@ -44,20 +48,40 @@ class SquareMap:
         self.board[change_y_pos][change_x_pos] = 0 if self.board[change_y_pos][change_x_pos] == 1 else 1
         print(self.board[change_y_pos][change_x_pos])
 
+    def display_component(self):
+        self.graph.update_graph(self.board)
+        list_component = self.graph.find_list_connected_component()
+        for index, components in enumerate(list_component):
+            for component in components:
+                pos_component = [int(i) for i in component.split('_')]
+                print(pos_component)
+                self.display_num(index, pos_component[0], pos_component[1])
+
+    def display_num(self, num_to_show, _x_pos, _y_pos):
+        textsurface = self.myfont.render(str(num_to_show), False, (0, 0, 0))
+        self.game_display.blit(textsurface, (_x_pos * self.cellsize, _y_pos * self.cellsize))
+
     def loop(self):
         crashed = False
+        self.game_display.fill(self.game_color['white'])
+        self.display_map()
+        pygame.display.update()
         while not crashed:
+            is_something_new = False
             for event in pygame.event.get():
                 # print(event)
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.update_pos(pygame.mouse.get_pos())
+                    is_something_new = True
                 if event.type == pygame.QUIT:
                     crashed = True
 
-            self.game_display.fill(self.game_color['white'])
-            self.display_map()
+            if is_something_new:
+                self.game_display.fill(self.game_color['white'])
+                self.display_map()
+                self.display_component()
+                pygame.display.update()
             # self.display_num()
-            pygame.display.update()
 
 
 if __name__ == "__main__":

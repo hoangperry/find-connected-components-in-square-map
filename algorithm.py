@@ -68,7 +68,7 @@ def kosaraju(mat):
 
 
 class Graph:
-    def __init__(self, num_of_node=0):
+    def __init__(self):
         self.adj_mat = None
 
     def add_vertex(self, name):
@@ -85,6 +85,8 @@ class Graph:
             self.adj_mat[key][name] = 0
 
     def print_adj_mat(self):
+        if self.adj_mat is None:
+            return
         for key in self.adj_mat:
             for _key in self.adj_mat[key]:
                 print(self.adj_mat[key][_key], end=" ")
@@ -106,30 +108,60 @@ class Graph:
                 visited = self.DFS(key, visited)
         return visited
 
+    def update_graph(self, mat):
+        self.adj_mat = None
+        list_v = list()
+        for i in range(mat.__len__()):
+            for j in range(mat[i].__len__()):
+                if mat[i][j] == 1:
+                    name_v = "{}_{}".format(j, i)
+                    self.add_vertex(name_v)
+                    list_v.append(name_v)
 
-if __name__ == '__main__':
-    graph = Graph()
-    adj_matrix = load_adj_matrix_from_file('adj_matrix_test.txt')
-    list_v = list()
-    for i in range(adj_matrix.__len__()):
-        for j in range(adj_matrix[i].__len__()):
-            if adj_matrix[i][j] == 1:
-                name_v = "{}_{}".format(j, i)
-                graph.add_vertex(name_v)
-                list_v.append(name_v)
+        for i in range(list_v.__len__()):
+            for j in range(i + 1, list_v.__len__()):
+                kaa_1 = [int(x) for x in list_v[i].split("_")]
+                kaa_2 = [int(x) for x in list_v[j].split("_")]
+                if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
+                    self.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
 
-    for i in range(list_v.__len__()):
-        for j in range(i + 1, list_v.__len__()):
-            kaa_1 = [int(x) for x in list_v[i].split("_")]
-            kaa_2 = [int(x) for x in list_v[j].split("_")]
-            if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
-                graph.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
+    def find_list_connected_component(self):
+        if self.adj_mat is None:
+            return list()
+        visited = list()
+        components = list()
+        for i in self.adj_mat:
+            if i in visited:
+                continue
+            a = self.DFS(i)
+            visited += a
+            components.append(a)
+        return components
 
-    graph.print_adj_mat()
-    v = list()
-    for i in graph.adj_mat:
-        if i in v:
-            continue
-        a = graph.DFS(i)
-        v += a
-        print(a)
+
+# if __name__ == '__main__':
+#     graph = Graph()
+#     adj_matrix = load_adj_matrix_from_file('adj_matrix_test.txt')
+#     list_v = list()
+    # for i in range(adj_matrix.__len__()):
+    #     for j in range(adj_matrix[i].__len__()):
+    #         if adj_matrix[i][j] == 1:
+    #             name_v = "{}_{}".format(j, i)
+    #             graph.add_vertex(name_v)
+    #             list_v.append(name_v)
+    #
+    # for i in range(list_v.__len__()):
+    #     for j in range(i + 1, list_v.__len__()):
+    #         kaa_1 = [int(x) for x in list_v[i].split("_")]
+    #         kaa_2 = [int(x) for x in list_v[j].split("_")]
+    #         if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
+    #             graph.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
+
+    # graph.print_adj_mat()
+    # v = list()
+    # for i in graph.adj_mat:
+    #     if i in v:
+    #         continue
+    #     a = graph.DFS(i)
+    #     v += a
+    #     print(a)
