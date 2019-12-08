@@ -147,6 +147,24 @@ class GraphAdjList:
     def __init__(self):
         self.adj_list = None
 
+    def print_adj_list(self):
+        for i in self.adj_list:
+            print("{}: ".format(i), end='')
+            for j in self.adj_list[i]:
+                print(j, end=' ')
+            print()
+
+    def load_from_graph_file(self, filename):
+        self.adj_list = dict()
+        list_file = [
+            i.strip().split(' ')
+            for i in open('test_adj_list.txt', mode='r').read().strip().split('\n')
+        ]
+        for vertex in list_file:
+            self.adj_list[vertex[0]] = list()
+            for adding_vertex in vertex[1:]:
+                self.adj_list[vertex[0]].append(adding_vertex)
+
     def add_vertex(self, name):
         if self.adj_list is None:
             self.adj_list = {
