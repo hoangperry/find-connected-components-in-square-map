@@ -1,5 +1,5 @@
 import pygame
-from algorithm import Graph
+from algorithm import GraphAdjMatrix, GraphAdjList
 
 
 class SquareMap:
@@ -14,7 +14,7 @@ class SquareMap:
         self.windows_width = cellsize * board_width
         self.windows_height = cellsize * board_height
         self.game_display = pygame.display.set_mode((self.windows_width, self.windows_height))
-        self.graph = Graph()
+        self.graph = GraphAdjList()
         self.clock = pygame.time.Clock()
         self.game_color = {
             'black': (0, 0, 0),
@@ -50,11 +50,10 @@ class SquareMap:
 
     def display_component(self):
         self.graph.update_graph(self.board)
-        list_component = self.graph.find_list_connected_component(algorithm='bfs')
+        list_component = self.graph.find_list_connected_component(algorithm='dfs')
         for index, components in enumerate(list_component):
             for component in components:
                 pos_component = [int(i) for i in component.split('_')]
-                print(pos_component)
                 self.display_num(index, pos_component[0], pos_component[1])
 
     def display_num(self, num_to_show, _x_pos, _y_pos):

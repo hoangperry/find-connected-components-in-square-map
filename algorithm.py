@@ -1,73 +1,7 @@
 import random
 
 
-def print_matrix(mat):
-    for i in mat:
-        print(i)
-
-
-def print_adj_list(_list):
-    for i in _list:
-        print(i)
-
-
-def generate_random_map(size):
-    return [[random.randint(0, 1) for j in range(size)] for i in range(size)]
-
-
-def adj_matrix_to_adj_list(mat):
-    adj_list = [list() for i in range(mat.__len__())]
-    for i in range(mat.__len__()):
-        for j in range(mat[0].__len__()):
-            if mat[i][j] == 1:
-                adj_list[i].append(j)
-    return adj_list
-
-
-def adj_list_to_adj_matrix(_list):
-    adj_mat = [
-        [
-            0 for j in range(_list.__len__())
-        ]
-        for i in range(_list.__len__())
-    ]
-    for i in range(_list.__len__()):
-        for j in range(_list[i].__len__()):
-            adj_mat[i][_list[i][j]] = 1
-    return adj_mat
-
-
-def load_adj_matrix_from_file(filename):
-    return [
-        [
-            int(j)
-            for j in row.strip().split(' ')
-        ]
-        for row in open(filename, mode='r').read().split('\n')
-        if row.__len__() != 0
-    ]
-
-
-def dfs_matrix(mat, v=0, visited=list()):
-    visited.append(v)
-    for i in range(mat[v].__len__()):
-        if mat[v][i] == 1 and i not in visited:
-            visited = dfs_matrix(mat, i, visited)
-    return visited
-
-
-def kosaraju(mat):
-    visited = list()
-    S = [dfs_matrix(mat, 0)]
-    for i in range(1, mat.__len__()):
-        for visited in S:
-            if i not in visited:
-                S.append(dfs_matrix(mat, i))
-                break
-    return S
-
-
-class Graph:
+class GraphAdjMatrix:
     def __init__(self):
         self.adj_mat = None
 
@@ -97,7 +31,7 @@ class Graph:
         self.adj_mat[destination_vertex][source_vertex] = 1
         return
 
-    def DFS(self, v, visited=None):
+    def dfs_recursive(self, v, visited=None):
         if visited is None:
             visited = list()
         if self.adj_mat is None:
@@ -105,19 +39,45 @@ class Graph:
         visited.append(v)
         for key in self.adj_mat[v]:
             if self.adj_mat[v][key] == 1 and key not in visited:
-                visited = self.DFS(key, visited)
+                visited = self.dfs_recursive(key, visited)
         return visited
 
-    def BFS(self, v, visited=None):
-        if visited is None:
-            visited = list()
-            visited.append(v)
-        if self.adj_mat is None:
-            return list()
-        for key in self.adj_mat[v]:
-            if self.adj_mat[v][key] == 1:
-                visited.append(v)
-                visited = self.BFS(key, visited)
+    # def bfs_recursive(self, v, visited=None):
+    #     if visited is None:
+    #         visited = list()
+    #         visited.append(v)
+    #     if self.adj_mat is None:
+    #         return list()
+    #     for key in self.adj_mat[v]:
+    #         if self.adj_mat[v][key] == 1:
+    #             visited.append(v)
+    #             visited = self.bfs_recursive(key, visited)
+    #     return visited
+
+    def bfs_non_recurisve(self, v):
+        visited = [v]
+        queue = [v]
+        while not queue.__len__() == 0:
+            v = queue[0]
+            queue = queue[1:]
+            for key in self.adj_mat[v]:
+                if self.adj_mat[v][key] == 1 and key not in visited:
+                    print(key)
+                    visited.append(key)
+                    queue.append(key)
+        return visited
+
+    def dfs_non_recursive(self, v):
+        visited = list()
+        stack = [v]
+        while stack:
+            key = stack.pop()
+            if key in visited:
+                continue
+            visited.append(key)
+            for i in self.adj_mat[key]:
+                if self.adj_mat[key][i] == 1:
+                    stack.append(i)
         return visited
 
     def update_graph(self, mat):
@@ -145,7 +105,7 @@ class Graph:
         for i in self.adj_mat:
             if i in visited:
                 continue
-            a = self.DFS(i)
+            a = self.dfs_non_recursive(i)
             visited += a
             components.append(a)
         return components
@@ -158,7 +118,99 @@ class Graph:
         for i in self.adj_mat:
             if i in visited:
                 continue
-            a = self.DFS(i)
+            a = self.bfs_non_recurisve(i)
+            visited += a
+            components.append(a)
+        return components
+
+    def find_list_connected_component(self, algorithm):
+        if algorithm.lower() == 'bfs':
+            return self.find_list_connected_component_bfs()
+        elif algorithm.lower() == 'dfs':
+            return self.find_list_connected_component_dfs()
+
+
+class GraphAdjList:
+    def __init__(self):
+        self.adj_list = None
+
+    def add_vertex(self, name):
+        if self.adj_list is None:
+            self.adj_list = {
+                name: list()
+            }
+            return
+        self.adj_list[name] = list()
+
+    def add_edge(self, source_vertex, destination_vertex):
+        self.adj_list[source_vertex].append(destination_vertex)
+        self.adj_list[destination_vertex].append(source_vertex)
+        return
+
+    def update_graph(self, mat):
+        self.adj_list = None
+        list_v = list()
+        for i in range(mat.__len__()):
+            for j in range(mat[i].__len__()):
+                if mat[i][j] == 1:
+                    name_v = "{}_{}".format(j, i)
+                    self.add_vertex(name_v)
+                    list_v.append(name_v)
+
+        for i in range(list_v.__len__()):
+            for j in range(i + 1, list_v.__len__()):
+                kaa_1 = [int(x) for x in list_v[i].split("_")]
+                kaa_2 = [int(x) for x in list_v[j].split("_")]
+                if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
+                    self.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
+
+    def bfs_non_recurisve(self, v):
+        visited = [v]
+        queue = [v]
+        while not queue.__len__() == 0:
+            v = queue[0]
+            queue = queue[1:]
+            for key in self.adj_list[v]:
+                if key not in visited:
+                    print(key)
+                    visited.append(key)
+                    queue.append(key)
+        return visited
+
+    def dfs_non_recursive(self, v):
+        visited = list()
+        stack = [v]
+        while stack:
+            key = stack.pop()
+            if key in visited:
+                continue
+            visited.append(key)
+            for i in self.adj_list[key]:
+                stack.append(i)
+        return visited
+
+    def find_list_connected_component_dfs(self):
+        if self.adj_list is None:
+            return list()
+        visited = list()
+        components = list()
+        for i in self.adj_list:
+            if i in visited:
+                continue
+            a = self.dfs_non_recursive(i)
+            visited += a
+            components.append(a)
+        return components
+
+    def find_list_connected_component_bfs(self):
+        if self.adj_list is None:
+            return list()
+        visited = list()
+        components = list()
+        for i in self.adj_list:
+            if i in visited:
+                continue
+            a = self.bfs_non_recurisve(i)
             visited += a
             components.append(a)
         return components
