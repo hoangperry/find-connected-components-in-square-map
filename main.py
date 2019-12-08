@@ -50,7 +50,7 @@ class SquareMap:
 
     def display_component(self):
         self.graph.update_graph(self.board)
-        list_component = self.graph.find_list_connected_component()
+        list_component = self.graph.find_list_connected_component(algorithm='bfs')
         for index, components in enumerate(list_component):
             for component in components:
                 pos_component = [int(i) for i in component.split('_')]

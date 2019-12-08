@@ -108,6 +108,18 @@ class Graph:
                 visited = self.DFS(key, visited)
         return visited
 
+    def BFS(self, v, visited=None):
+        if visited is None:
+            visited = list()
+            visited.append(v)
+        if self.adj_mat is None:
+            return list()
+        for key in self.adj_mat[v]:
+            if self.adj_mat[v][key] == 1:
+                visited.append(v)
+                visited = self.BFS(key, visited)
+        return visited
+
     def update_graph(self, mat):
         self.adj_mat = None
         list_v = list()
@@ -125,7 +137,7 @@ class Graph:
                 if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
                     self.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
 
-    def find_list_connected_component(self):
+    def find_list_connected_component_dfs(self):
         if self.adj_mat is None:
             return list()
         visited = list()
@@ -138,6 +150,24 @@ class Graph:
             components.append(a)
         return components
 
+    def find_list_connected_component_bfs(self):
+        if self.adj_mat is None:
+            return list()
+        visited = list()
+        components = list()
+        for i in self.adj_mat:
+            if i in visited:
+                continue
+            a = self.DFS(i)
+            visited += a
+            components.append(a)
+        return components
+
+    def find_list_connected_component(self, algorithm):
+        if algorithm.lower() == 'bfs':
+            return self.find_list_connected_component_bfs()
+        elif algorithm.lower() == 'dfs':
+            return self.find_list_connected_component_dfs()
 
 # if __name__ == '__main__':
 #     graph = Graph()
