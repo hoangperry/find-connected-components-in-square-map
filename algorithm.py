@@ -33,6 +33,7 @@ class GraphAdjMatrix:
             self.adj_mat[key][name] = 0
 
     def print_adj_mat(self):
+        print('\nGraph adjacency matrix: ')
         if self.adj_mat is None:
             return
         for key in self.adj_mat:
@@ -148,6 +149,7 @@ class GraphAdjList:
         self.adj_list = None
 
     def print_adj_list(self):
+        print('\nGraph adjacency list: ')
         for i in self.adj_list:
             print("{}: ".format(i), end='')
             for j in self.adj_list[i]:
@@ -158,7 +160,7 @@ class GraphAdjList:
         self.adj_list = dict()
         list_file = [
             i.strip().split(' ')
-            for i in open('test_adj_list.txt', mode='r').read().strip().split('\n')
+            for i in open(filename, mode='r').read().strip().split('\n')
         ]
         for vertex in list_file:
             self.adj_list[vertex[0]] = list()
@@ -203,7 +205,6 @@ class GraphAdjList:
             queue = queue[1:]
             for key in self.adj_list[v]:
                 if key not in visited:
-                    print(key)
                     visited.append(key)
                     queue.append(key)
         return visited
@@ -251,30 +252,3 @@ class GraphAdjList:
             return self.find_list_connected_component_bfs()
         elif algorithm.lower() == 'dfs':
             return self.find_list_connected_component_dfs()
-
-# if __name__ == '__main__':
-#     graph = Graph()
-#     adj_matrix = load_adj_matrix_from_file('adj_matrix_test.txt')
-#     list_v = list()
-    # for i in range(adj_matrix.__len__()):
-    #     for j in range(adj_matrix[i].__len__()):
-    #         if adj_matrix[i][j] == 1:
-    #             name_v = "{}_{}".format(j, i)
-    #             graph.add_vertex(name_v)
-    #             list_v.append(name_v)
-    #
-    # for i in range(list_v.__len__()):
-    #     for j in range(i + 1, list_v.__len__()):
-    #         kaa_1 = [int(x) for x in list_v[i].split("_")]
-    #         kaa_2 = [int(x) for x in list_v[j].split("_")]
-    #         if abs(kaa_1[0] - kaa_2[0]) <= 1 and abs(kaa_1[1] - kaa_2[1]) <= 1:
-    #             graph.add_edge("{}_{}".format(kaa_1[0], kaa_1[1]), "{}_{}".format(kaa_2[0], kaa_2[1]))
-
-    # graph.print_adj_mat()
-    # v = list()
-    # for i in graph.adj_mat:
-    #     if i in v:
-    #         continue
-    #     a = graph.DFS(i)
-    #     v += a
-    #     print(a)
