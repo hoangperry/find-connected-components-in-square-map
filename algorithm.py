@@ -5,6 +5,20 @@ class GraphAdjMatrix:
     def __init__(self):
         self.adj_mat = None
 
+    def load_from_graph_file(self, filename):
+        self.adj_mat = dict()
+        matrix_file = [
+            [
+                int(j)
+                for j in i.strip().split(' ')
+            ]
+            for i in open(filename, mode='r').read().strip().split('\n')
+        ]
+        for i in range(matrix_file.__len__()):
+            self.adj_mat[i] = dict()
+            for j in range(matrix_file[i].__len__()):
+                self.adj_mat[i][j] = matrix_file[i][j]
+
     def add_vertex(self, name):
         if self.adj_mat is None:
             self.adj_mat = {
@@ -62,7 +76,6 @@ class GraphAdjMatrix:
             queue = queue[1:]
             for key in self.adj_mat[v]:
                 if self.adj_mat[v][key] == 1 and key not in visited:
-                    print(key)
                     visited.append(key)
                     queue.append(key)
         return visited
